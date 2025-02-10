@@ -26,7 +26,7 @@ const Navbar = ({
   const [assistantStatus, setAssistantStatus] = useState(false);
 
   const handleActivateAssistant = async () => {
-    fetch("http://localhost:5000/activate", {
+    fetch("https://bluecode-b67w.onrender.com/activate", {
       method: "POST",
     })
       .then((response) => response.json())
