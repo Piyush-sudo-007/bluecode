@@ -1,0 +1,106 @@
+.code-editor {
+  flex-grow: 1;
+  height: 100%;
+  background-color: #1a1a1a;
+  overflow: hidden;
+  display: flex;
+}
+.output-area{
+  height: 83vh;
+  width: 0px;
+  background-color: #2e2e2e;
+  padding: 10px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  display: none;
+}
+.run-btn{
+  width: 0px;
+}
+.showOutput{
+  display: flex;
+  z-index: 100;
+  position: fixed;
+  right: 0;
+  width: 40%;
+  border-left: 2px solid grey;
+  transition: all 1s ease;
+}
+.main-output{
+  border: 1px solid green;
+  border-radius: 10px;
+  padding: 10px;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+}
+.error-output{
+  border: 1px solid red;
+}
+.error-output p{
+  color: rgb(248, 112, 112);
+}
+.loader{
+  width: 50px;
+  height: 50px;
+  border-top: 5px solid grey;
+  border-radius: 50%;
+  animation: rotate 1s ease infinite;
+}
+.input-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.input-modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.input-modal input {
+  width: 200px;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.input-modal button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+@keyframes rotate {
+  0%{
+    transform: rotate(360deg);
+  }
+  100%{
+    transform: rotate(0deg);
+  }
+}
+@media (max-width : 1300px) {
+  .showOutput{
+    width: 50%;
+  }
+}
+@media (max-width : 900px) {
+  .showOutput{
+    width: 100%;
+  }
+}

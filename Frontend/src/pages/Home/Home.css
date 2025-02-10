@@ -1,0 +1,15 @@
+.home {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  background-color: #1a1a1a;
+  color: #f0f0f0;
+  width: 100vw;
+  padding: 5px;
+}
+.arena{
+  width: 100%;
+}
+.home > * {
+  flex-shrink: 0;
+}
