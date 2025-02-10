@@ -1,3 +1,9 @@
+import subprocess
+
+# Check installed packages
+installed_packages = subprocess.check_output([sys.executable, "-m", "pip", "list"]).decode()
+print(installed_packages)
+
 import speech_recognition as sr
 import webbrowser
 import pyttsx3
