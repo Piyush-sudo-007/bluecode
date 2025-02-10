@@ -11,7 +11,7 @@ app.use(express.json());
 const server = http.createServer(app);
 
 app.post('/activate', (req, res) => {
-  const pythonProcess = spawn('python', ['Jarvis/jarvis.py']);
+  const pythonProcess = spawn('python', ['../Jarvis/jarvis.py']);
 
   pythonProcess.stdout.on('data', (data) => {
     console.log(`Output from Python script: ${data}`);
