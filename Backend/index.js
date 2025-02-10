@@ -11,7 +11,10 @@ app.use(express.json());
 const server = http.createServer(app);
 
 app.post('/activate', (req, res) => {
-const pythonScriptPath = path.join(__dirname, '..', 'Jarvis', 'jarvis.py');
+console.log('Current working directory (process.cwd()):', process.cwd());
+console.log('Current module directory (__dirname):', __dirname);
+    
+const pythonScriptPath = path.join(__dirname,'jarvis.py');
 
 console.log('Attempting to execute Python script at:', pythonScriptPath);
 
