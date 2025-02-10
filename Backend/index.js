@@ -11,16 +11,12 @@ app.use(express.json());
 const server = http.createServer(app);
 
 app.post('/activate', (req, res) => {
- console.log('Current working directory:', __dirname);
+const pythonScriptPath = path.join(__dirname, '..', '..', 'Jarvis', 'jarvis.py');
 
-// Log the full path to jarvis.py
-const fullPath = path.join(__dirname, '..', 'Jarvis', 'jarvis.py');
-console.log('Attempting to execute Python script at:', fullPath);
+console.log('Attempting to execute Python script at:', pythonScriptPath);
 
-// Attempt to spawn the process
-const pythonProcess = spawn('python', [fullPath]);
+const pythonProcess = spawn('python', [pythonScriptPath]);
 
-// Handle standard output and error
 pythonProcess.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);
 });
