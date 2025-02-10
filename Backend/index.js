@@ -11,7 +11,7 @@ app.use(express.json());
 const server = http.createServer(app);
 
 app.post('/activate', (req, res) => {
-const pythonScriptPath = path.join(__dirname, '..', '..', 'Jarvis', 'jarvis.py');
+const pythonScriptPath = path.join(__dirname, '..', 'Jarvis', 'jarvis.py');
 
 console.log('Attempting to execute Python script at:', pythonScriptPath);
 
