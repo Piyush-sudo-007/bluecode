@@ -11,15 +11,23 @@ app.use(express.json());
 const server = http.createServer(app);
 
 app.post('/activate', (req, res) => {
-  const pythonProcess = spawn('python', [path.join(__dirname, '..', 'Jarvis', 'jarvis.py')]);
+ console.log('Current working directory:', __dirname);
 
-  pythonProcess.stdout.on('data', (data) => {
-    console.log(`Output from Python script: ${data}`);
-  });
+// Log the full path to jarvis.py
+const fullPath = path.join(__dirname, '..', 'Jarvis', 'jarvis.py');
+console.log('Attempting to execute Python script at:', fullPath);
 
-  pythonProcess.stderr.on('data', (data) => {
-    console.error(`Error from Python script: ${data}`);
-  });
+// Attempt to spawn the process
+const pythonProcess = spawn('python', [fullPath]);
+
+// Handle standard output and error
+pythonProcess.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+});
+
+pythonProcess.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+});
 
   pythonProcess.on('close', (code) => {
     console.log(`Jarvis assistant exited with code ${code}`);
