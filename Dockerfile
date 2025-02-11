@@ -26,7 +26,7 @@ COPY . .
 WORKDIR /opt/render/project/src/Jarvis
 RUN pip install speechrecognition \
     && pip install pyttsx3 \
-    && pip install requests
+    && pip install requests \
     && pip install PyAudio
 
 # Install Node.js dependencies for the frontend
