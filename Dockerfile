@@ -24,8 +24,7 @@ COPY . .
 
 # Install Python dependencies for the backend
 WORKDIR /opt/render/project/src/Jarvis
-RUN pip install webbrowser \
-    && pip install requests
+RUN pip install webbrowser
 
 # Install Node.js dependencies for the frontend
 WORKDIR /opt/render/project/src
