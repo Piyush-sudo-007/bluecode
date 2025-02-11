@@ -16,10 +16,10 @@ def get_engine():
         engine = pyttsx3.init()
     return engine
 
+# The speak function has been replaced by text output
 def speak(text):
-    engine = get_engine()
-    engine.say(text)
-    engine.runAndWait()
+    # In this updated code, we no longer speak out loud, instead we return the text.
+    return text
 
 def get_desktop_path():
     user = os.environ["USERPROFILE"]
@@ -41,14 +41,13 @@ def open_item(path):
             elif system_name == "Linux":  # for linux
                 subprocess.Popen(["xdg-open", path])
             else:
-                speak("Can not support this Operating System.")
-                return
-            speak(f"Opening {os.path.basename(path)}")
+                return "Cannot support this Operating System."  # Changed from speak() to return
+            return f"Opening {os.path.basename(path)}"
         except Exception as e:
             print(f"Error in opening file: {e}")
-            speak("Unable to open this file.")
+            return "Unable to open this file."  # Changed from speak() to return
     else:
-        speak("Sorry! This specified item does not exist.")
+        return "Sorry! This specified item does not exist."  # Changed from speak() to return
 
 def open_folder(folder_name):
     desktop_path = get_desktop_path()
@@ -66,15 +65,15 @@ def open_folder(folder_name):
             elif system_name == "Linux":
                 subprocess.Popen(["xdg-open", folder_path])
             else:
-                speak("Unsupported operating system.")
-                return
+                return "Unsupported operating system."  # Changed from speak() to return
             folder_name = os.path.basename(folder_path)  # Extract only the folder name
-            speak(f"Opening folder {folder_name}")
+            return f"Opening folder {folder_name}"  # Changed from speak() to return
 
         except Exception as e:
             print(f"Error opening folder: {e}")
+            return "Error opening folder."  # Changed from speak() to return
     else:
-        speak("No such folder exists.")
+        return "No such folder exists."  # Changed from speak() to return
 
 def processCommand(command):
     # Send recognized command to the backend API for processing
@@ -86,14 +85,14 @@ def processCommand(command):
         if response.status_code == 200:
             result = response.json()
             if "output" in result:
-                speak(result["output"])  # Speak the response from the backend
+                return result["output"]  # Return the response from the backend as text
             else:
-                speak("I couldn't understand the response.")
+                return "I couldn't understand the response."  # Changed from speak() to return
         else:
-            speak("There was an issue with processing your request.")
+            return "There was an issue with processing your request."  # Changed from speak() to return
     except requests.exceptions.RequestException as e:
         print(f"Error communicating with backend: {e}")
-        speak("Sorry, I couldn't reach the server.")
+        return "Sorry, I couldn't reach the server."  # Changed from speak() to return
 
 def listen():
     try:
@@ -102,15 +101,14 @@ def listen():
             audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
             return recognizer.recognize_google(audio)
     except sr.UnknownValueError:
-        speak("Sorry, I didn't catch that.")
-        return None
+        return "Sorry, I didn't catch that."  # Changed from speak() to return
     except Exception as e:
         print(f"Error: {e}")
         return None
 
 def jarvis_main():
     is_active = False
-    speak("Say 'beta' to activate me... and 'deactivate' to exit.")
+    response = "Say 'beta' to activate me... and 'deactivate' to exit."
     
     while True:
         r = sr.Recognizer()
@@ -124,10 +122,10 @@ def jarvis_main():
                 print(word)
                 if word.lower() == "beta":
                     is_active = True
-                    speak("Yes! How can I help you?")
+                    response = "Yes! How can I help you?"
                 elif word.lower() == "deactivate":
                     is_active = False
-                    speak("See you soon!")
+                    response = "See you soon!"
                     break
             else:
                 # Listen for command
@@ -137,14 +135,18 @@ def jarvis_main():
                     command = r.recognize_google(audio)
                     if command.lower() == "deactivate":
                         is_active = False
-                        speak("See you soon!")
+                        response = "See you soon!"
                     else:
-                        processCommand(command)
+                        response = processCommand(command)  # Get the text response for the command
 
         except sr.UnknownValueError:
-            print("Sorry! I didn't understand.")
+            response = "Sorry! I didn't understand."
         except Exception as e:
             print(f"Error: {e}")
+            response = f"Error: {e}"
+
+    return response  # Return the final response after main loop ends
 
 if __name__ == "__main__":
-    jarvis_main()
+    final_response = jarvis_main()  # Call the main function and get the response
+    print(final_response)  # Print the response at the end
