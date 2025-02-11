@@ -23,8 +23,8 @@ WORKDIR /opt/render/project/src
 COPY . .
 
 # Install Python dependencies for the backend
-WORKDIR /opt/render/project/src/Jarvis
-RUN pip install webbrowser
+# WORKDIR /opt/render/project/src/Jarvis
+# RUN pip install webbrowser
 
 # Install Node.js dependencies for the frontend
 WORKDIR /opt/render/project/src
