@@ -1,8 +1,8 @@
 import webbrowser
 import os
-import musicLibrary
 import subprocess
 import platform
+import musicLibrary
 
 # Function to get desktop path
 def get_desktop_path():
@@ -15,7 +15,7 @@ def get_desktop_path():
 # Function to open a folder or file
 def open_item(path):
     if os.path.isdir(path):  # Open folder
-        open_folder(path)
+        return open_folder(path)
     elif os.path.isfile(path):  # Open file
         try:
             system_name = platform.system()
@@ -59,11 +59,12 @@ def open_folder(folder_name):
     else:
         return "No such folder exists."
 
-# Function to process the command
+# Function to process the command dynamically
 def processCommand(command):
     command = command.lower()  # Convert to lowercase for easier matching
     response = ""
 
+    # Handle opening a folder
     if "open" in command and "folder" in command:
         folder_command = command.replace("open", "").replace("folder", "").strip()
         desktop_path = get_desktop_path()
@@ -71,34 +72,34 @@ def processCommand(command):
         folder_path = os.path.join(desktop_path, folder_name)
 
         if os.path.exists(folder_path):
-            response = f"Do you want to open a subfolder or a file in {folder_name}? Say subfolder or file name."
-            return response
+            return open_folder(folder_name)  # Open the folder and return response
         else:
-            response = "No such folder exists."
-            return response
+            return "No such folder exists."
     
+    # Handle opening a website
     elif "open" in command:
         website_name = command.replace("open", "").strip()
         if "." not in website_name:
             website_name = f"{website_name}.com"
         url = f"https://{website_name}"
-        response = f"Opening {website_name}"
-        webbrowser.open(url)
-        return response
-
-    elif command.startswith("play"):
-        songs = command.split(" ")[1]
-        link = musicLibrary.music.get(songs)
-
-        if link:
-            response = f"Playing {songs}"
-            webbrowser.open(link)
+        webbrowser.open(url)  # Open the website
+        return f"Opening {website_name}"
+    
+    # Handle playing a song
+    elif "play" in command:
+        song_name = command.replace("play", "").strip()  # Get the song name after "play"
+        if song_name:
+            link = musicLibrary.music.get(song_name)  # Search the song in musicLibrary
+            if link:
+                webbrowser.open(link)  # Open the link to play the song
+                return f"Playing {song_name}"
+            else:
+                return f"Sorry, I couldn't find the song '{song_name}'."
         else:
-            response = "Sorry, I couldn't find the song."
-        return response
-    else:
-        response = "Sorry, I didn't understand the command."
-        return response
+            return "Please specify a song name after 'play'."
+    
+    # Default response for unrecognized command
+    return "Sorry, I didn't understand the command."
 
 # Main function to simulate receiving commands from a server (text input)
 def backend_command(input_command):
@@ -109,10 +110,4 @@ def backend_command(input_command):
 
 # Example Usage - commands received from the backend (simulated)
 if __name__ == "__main__":
-    # Example command for opening a website
-    website_command = "open youtube"
-    print(backend_command(website_command))  # Outputs: "Opening youtube"
-
-    # Example command for playing a song
-    song_command = "play song shape of you"
-    print(backend_command(song_command))  # Outputs: "Playing shape of you"
+    processCommand();
