@@ -7,6 +7,10 @@ RUN apt-get update && apt-get install -y \
     portaudio19-dev \
     gcc \
     curl \
+    alsa-utils \
+    alsa-oss \
+    libasound2 \
+    libasound2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js
