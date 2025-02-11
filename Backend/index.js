@@ -10,46 +10,43 @@ app.use(express.json());
 
 const server = http.createServer(app);
 
-const urlRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(?:\/[^\s]*)?/;
-
 app.post('/process-audio', (req, res) => {
   const recognizedText = req.body.text;
   console.log('Recognized Text:', recognizedText);
 
-  if (/open\s+(https?:\/\/[^\s]+|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/.test(recognizedText)) {
-    // Extract the website name (e.g., "Google")
+  if (/open\s+[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(recognizedText) || /open\s+[a-zA-Z]+/.test(recognizedText)) {
     const website = recognizedText.replace(/^open\s+/i, '').trim();
-
-    // If the recognized text is just a website name, construct the URL
+    
     const websiteURL = website.includes("http") ? website : `https://www.${website}.com`;
 
     console.log(`Opening website: ${websiteURL}`);
 
-    // Open the website
     open(websiteURL)
       .then(() => {
-        res.json({ output: `Opening website ${websiteURL}` });
+        res.json({ output: `Task completed: Opening website ${websiteURL}` });
       })
       .catch((err) => {
         console.error('Error opening website:', err);
         res.status(500).json({ error: 'Failed to open the website.' });
       });
 
-  } else {
-    // If it's a song or music request, assume it's a song and open YouTube search
-    const songURL = `https://www.youtube.com/results?search_query=${encodeURIComponent(recognizedText)}`;
+  } else if (/play\s+song\s+/i.test(recognizedText)) {
+    const songName = recognizedText.replace(/^play\s+song\s+/i, '').trim();
+    const songURL = `https://www.youtube.com/results?search_query=${encodeURIComponent(songName)}`;
 
     console.log(`Searching for song on YouTube: ${songURL}`);
     
-    // Open YouTube search
     open(songURL)
       .then(() => {
-        res.json({ output: `Playing your requested song on YouTube!` });
+        res.json({ output: `Task completed: Playing your requested song on YouTube!` });
       })
       .catch((err) => {
         console.error('Error opening YouTube:', err);
         res.status(500).json({ error: 'Failed to open YouTube.' });
       });
+
+  } else {
+    res.status(400).json({ error: 'Unrecognized command. Please say "open [website]" or "play song [song name]"' });
   }
 });
 
