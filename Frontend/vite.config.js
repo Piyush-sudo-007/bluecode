@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0', // Make Vite accessible externally
-    port: process.env.PORT || 5173 // Use Render's provided port, or fall back to 5173
+    port: process.env.PORT || 5173, // Use Render's provided port, or fall back to 5173
+    allowedHosts: ['bluecode-jeds.onrender.com'], // Allow your specific Render host
   }
 });
