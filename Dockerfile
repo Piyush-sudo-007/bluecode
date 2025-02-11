@@ -34,8 +34,12 @@ RUN npm install
 # Build the frontend
 RUN npm run build
 
-# Expose the application port (e.g., 3000)
-EXPOSE 3000
+# Expose the frontend port (Vite typically runs on 5173)
+EXPOSE 5173
+
+# Set the environment variable for Vite to bind to 0.0.0.0 on the correct port
+ENV VITE_PORT=5173
+ENV HOST=0.0.0.0
 
 # Set the default command to start the application
 CMD ["npm", "run", "dev"]
