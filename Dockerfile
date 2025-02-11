@@ -42,4 +42,5 @@ ENV VITE_PORT=5173
 ENV HOST=0.0.0.0
 
 # Set the default command to start the application
+WORKDIR /opt/render/project/src
 RUN npm run dev
