@@ -3,6 +3,7 @@ import os
 import subprocess
 import platform
 import musicLibrary
+import sys
 
 # Function to get desktop path
 def get_desktop_path():
@@ -60,7 +61,7 @@ def open_folder(folder_name):
         return "No such folder exists."
 
 # Function to process the command dynamically
-def processCommand(command):
+def process_command(command):
     command = command.lower()  # Convert to lowercase for easier matching
     response = ""
 
@@ -104,14 +105,9 @@ def processCommand(command):
 # Main function to simulate receiving commands from a server (text input)
 def backend_command(input_command):
     print(f"Received command: {input_command}")
-    response = processCommand(input_command)  # Process the command
+    response = process_command(input_command)  # Process the command
     print(f"Response: {response}")
     return response  # Return response as text for the server to handle
-
-# Example Usage - commands received from the backend (simulated)
-import sys
-
-# Your other imports and functions here (like process_command)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -123,4 +119,3 @@ if __name__ == "__main__":
     print(f"Received command: {input_command}")
     response = process_command(input_command)
     print(response)
-
