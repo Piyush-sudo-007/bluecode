@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon Backend/index.js",
-    "build": "npm install && cd Jarvis && apt-get update && apt-get install -y espeak-ng portaudio19-dev gcc && pip install -r requirements.txt && cd ../Frontend && npm install && npm run build"
+    "build": "npm install && cd Jarvis && pip install -r requirements.txt && cd ../Frontend && npm install && npm run build"
   },
   "author": "piyush",
   "license": "ISC",
