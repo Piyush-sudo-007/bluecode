@@ -24,6 +24,7 @@ const Navbar = ({
   selectedProject,
 }) => {
   const [assistantStatus, setAssistantStatus] = useState(false);
+  const [active , setActive] = useState(false);
 
   const speak = (text) => {
     const speech = new SpeechSynthesisUtterance(text);
@@ -32,6 +33,7 @@ const Navbar = ({
   };
 
  const startListening = () => {
+  setActive(true);
   const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
   recognition.lang = "en-US";
   recognition.continuous = false;
@@ -53,6 +55,7 @@ const Navbar = ({
     .then((response) => {
       if (!response.ok) {
         throw new Error("Failed to fetch data from backend.");
+        setActive(false);
       }
       return response.json();
     })
@@ -60,8 +63,10 @@ const Navbar = ({
       console.log("Response from Jarvis: ", data);
       if (data.output) {
         speak(data.output);  // Speak the output received from Jarvis
+        setActive(false);
       } else {
         toast.warn("No output from Jarvis.");
+        setActive(false);
       }
     })
     .catch((error) => {
@@ -182,7 +187,7 @@ const Navbar = ({
       <div className="btns">
         <div className="assistant" onClick={startListening}>
           <p className="tag">&#128075; I am Byte, your voice assistant</p>
-          <img src={icon} alt="Assistant Icon" />
+          <img classname={`${active && "on"}`} src={icon} alt="Assistant Icon" />
           {assistantStatus && <p>Assistant is active!</p>}{" "}
         </div>
         <button className="run" onClick={handleRun}>
