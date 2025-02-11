@@ -14,6 +14,9 @@ app.post('/process-audio', (req, res) => {
   const recognizedText = req.body.text;
   console.log('Recognized Text:', recognizedText);
 
+  let responseMessage = '';
+  let linkToShow = '';
+
   // If the recognized text is a command to open a website (e.g., "open Google")
   if (/open\s+[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(recognizedText) || /open\s+[a-zA-Z]+/.test(recognizedText)) {
     const website = recognizedText.replace(/^open\s+/i, '').trim();
@@ -25,17 +28,21 @@ app.post('/process-audio', (req, res) => {
     if (process.env.DOCKER) {
       // Log the URL to the console if in Docker
       console.log(`Docker: URL to open: ${websiteURL}`);
-      res.json({ output: `Task completed: Opening website ${websiteURL} (Logged to console)` });
+      responseMessage = `Opening ${website} (Logged to console)`;
+      linkToShow = websiteURL;
     } else {
       // If not in Docker, try to open the URL in the browser
       open(websiteURL)
         .then(() => {
-          res.json({ output: `Opening ${website}` });
+          responseMessage = `Opening ${website}`;
+          linkToShow = websiteURL;
+          res.json({ output: responseMessage, link: linkToShow });
         })
         .catch((err) => {
           console.error('Error opening website:', err);
           res.status(500).json({ error: 'Failed to open the website.' });
         });
+      return; // Ensure the response is sent only after the open is complete
     }
 
   } else if (/play\s+song\s+/i.test(recognizedText)) {
@@ -48,22 +55,25 @@ app.post('/process-audio', (req, res) => {
     if (process.env.DOCKER) {
       // Log the URL for debugging in Docker (headless environment)
       console.log(`Docker: URL to open: ${songURL}`);
-      res.json({ output: `Task completed: Playing your requested song on YouTube! (Logged to console)` });
+      responseMessage = `Playing your requested song on YouTube! (Logged to console)`;
+      linkToShow = songURL;
     } else {
       // If not in Docker, open YouTube search
       open(songURL)
         .then(() => {
-          res.json({ output: `Playing ${songName} on YouTube!` });
+          responseMessage = `Playing ${songName} on YouTube!`;
+          linkToShow = songURL;
+          res.json({ output: responseMessage, link: linkToShow });
         })
         .catch((err) => {
           console.error('Error opening YouTube:', err);
           res.status(500).json({ error: 'Failed to open YouTube.' });
         });
+      return; // Ensure the response is sent only after the open is complete
     }
 
   } else {
-    // If the input doesn't match any known command
-    res.status(400).json({ output: 'Unrecognized command try opening website or playing some songs' });
+    res.status(400).json({ output: 'Unrecognized command. Try opening a website or playing a song.' });
   }
 });
 
