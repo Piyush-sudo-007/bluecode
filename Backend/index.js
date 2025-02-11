@@ -12,6 +12,7 @@ const server = http.createServer(app);
 
 app.post('/process-audio', (req, res) => {
   const recognizedText = req.body.text;
+  console.log(recognizedText);
   
   const pythonScriptPath = path.join(__dirname, 'Jarvis', 'jarvis.py');
   const pythonProcess = spawn('python', [pythonScriptPath, recognizedText]);
