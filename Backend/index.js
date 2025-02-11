@@ -23,7 +23,7 @@ app.post('/process-audio', (req, res) => {
 
     open(websiteURL)
       .then(() => {
-        res.json({ output: `Task completed: Opening website ${websiteURL}` });
+        res.json({ output: `Opening ${website}` });
       })
       .catch((err) => {
         console.error('Error opening website:', err);
@@ -38,7 +38,7 @@ app.post('/process-audio', (req, res) => {
     
     open(songURL)
       .then(() => {
-        res.json({ output: `Task completed: Playing your requested song on YouTube!` });
+        res.json({ output: `Playing ${songName} on YouTube!` });
       })
       .catch((err) => {
         console.error('Error opening YouTube:', err);
@@ -46,7 +46,7 @@ app.post('/process-audio', (req, res) => {
       });
 
   } else {
-    res.status(400).json({ error: 'Unrecognized command. Please say "open [website]" or "play song [song name]"' });
+    res.status(400).json({ output: 'Unrecognized command try opening website or playing some song' });
   }
 });
 
