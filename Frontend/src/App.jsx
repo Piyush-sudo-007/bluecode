@@ -7,7 +7,7 @@ import Logo from "./pages/Logo/Logo";
 import { ToastContainer } from "react-toastify";
 import { Route, Routes } from "react-router-dom";
 
-const socket = io("https://bluecode-b67w.onrender.com");
+const socket = io("https://bluecode-jeds.onrender.com");
 
 function App() {
   const [user, setUser] = useState(true);
