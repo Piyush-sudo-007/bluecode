@@ -25,6 +25,12 @@ const Navbar = ({
 }) => {
   const [assistantStatus, setAssistantStatus] = useState(false);
 
+  const speak = (text) => {
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = 'en-US';  // Set the language to English
+    window.speechSynthesis.speak(speech);  // Speak the text
+  };
+
   const startListening = () => {
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = "en-US";
@@ -46,6 +52,9 @@ const Navbar = ({
         .then((response) => response.json())
         .then((data) => {
           console.log("Response from Jarvis: ", data);
+          if (data.output) {
+            speak(data.output);  // Speak the output received from Jarvis
+          }
         })
         .catch((error) => {
           console.error("Error processing audio: ", error);
