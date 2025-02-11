@@ -43,6 +43,4 @@ ENV HOST=0.0.0.0
 
 # Set the default command to start the application
 WORKDIR /opt/render/project/src
-RUN npm run dev
-
 CMD ["npm", "run", "dev"]
