@@ -14,39 +14,56 @@ app.post('/process-audio', (req, res) => {
   const recognizedText = req.body.text;
   console.log('Recognized Text:', recognizedText);
 
+  // If the recognized text is a command to open a website (e.g., "open Google")
   if (/open\s+[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(recognizedText) || /open\s+[a-zA-Z]+/.test(recognizedText)) {
     const website = recognizedText.replace(/^open\s+/i, '').trim();
-    
     const websiteURL = website.includes("http") ? website : `https://www.${website}.com`;
 
     console.log(`Opening website: ${websiteURL}`);
 
-    open(websiteURL)
-      .then(() => {
-        res.json({ output: `Opening ${website}` });
-      })
-      .catch((err) => {
-        console.error('Error opening website:', err);
-        res.status(500).json({ error: 'Failed to open the website.' });
-      });
+    // Check if the environment is Docker or not
+    if (process.env.DOCKER) {
+      // Log the URL to the console if in Docker
+      console.log(`Docker: URL to open: ${websiteURL}`);
+      res.json({ output: `Task completed: Opening website ${websiteURL} (Logged to console)` });
+    } else {
+      // If not in Docker, try to open the URL in the browser
+      open(websiteURL)
+        .then(() => {
+          res.json({ output: `Opening ${website}` });
+        })
+        .catch((err) => {
+          console.error('Error opening website:', err);
+          res.status(500).json({ error: 'Failed to open the website.' });
+        });
+    }
 
   } else if (/play\s+song\s+/i.test(recognizedText)) {
+    // If it's a song request (e.g., "play song Kesariya"), assume it's a song
     const songName = recognizedText.replace(/^play\s+song\s+/i, '').trim();
     const songURL = `https://www.youtube.com/results?search_query=${encodeURIComponent(songName)}`;
 
     console.log(`Searching for song on YouTube: ${songURL}`);
-    
-    open(songURL)
-      .then(() => {
-        res.json({ output: `Playing ${songName} on YouTube!` });
-      })
-      .catch((err) => {
-        console.error('Error opening YouTube:', err);
-        res.status(500).json({ error: 'Failed to open YouTube.' });
-      });
+
+    if (process.env.DOCKER) {
+      // Log the URL for debugging in Docker (headless environment)
+      console.log(`Docker: URL to open: ${songURL}`);
+      res.json({ output: `Task completed: Playing your requested song on YouTube! (Logged to console)` });
+    } else {
+      // If not in Docker, open YouTube search
+      open(songURL)
+        .then(() => {
+          res.json({ output: `Playing ${songName} on YouTube!` });
+        })
+        .catch((err) => {
+          console.error('Error opening YouTube:', err);
+          res.status(500).json({ error: 'Failed to open YouTube.' });
+        });
+    }
 
   } else {
-    res.status(400).json({ output: 'Unrecognized command try opening website or playing some song' });
+    // If the input doesn't match any known command
+    res.status(400).json({ output: 'Unrecognized command try opening website or playing some songs' });
   }
 });
 
