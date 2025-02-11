@@ -13,23 +13,35 @@ const server = http.createServer(app);
 app.post('/process-audio', (req, res) => {
   const recognizedText = req.body.text;
   
-  const pythonScriptPath = path.join(__dirname, 'Jarvis' , 'jarvis.py');
+  const pythonScriptPath = path.join(__dirname, 'Jarvis', 'jarvis.py');
   const pythonProcess = spawn('python', [pythonScriptPath, recognizedText]);
 
+  let responseSent = false;  // Flag to prevent sending multiple responses
+
   pythonProcess.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-    res.json({ output: data.toString() });
+    if (!responseSent) {
+      console.log(`stdout: ${data}`);
+      res.json({ output: data.toString() });
+      responseSent = true;  // Mark the response as sent
+    }
   });
 
   pythonProcess.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-    res.status(500).json({ error: data.toString() });
+    if (!responseSent) {
+      console.error(`stderr: ${data}`);
+      res.status(500).json({ error: data.toString() });
+      responseSent = true;
+    }
   });
 
   pythonProcess.on('close', (code) => {
-    console.log(`Jarvis process exited with code ${code}`);
+    if (!responseSent) {
+      console.log(`Jarvis process exited with code ${code}`);
+      responseSent = true;
+    }
   });
 });
+
 
 const io = new Server(server, {
   cors: {
