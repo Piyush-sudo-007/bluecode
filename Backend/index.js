@@ -10,29 +10,25 @@ app.use(express.json());
 
 const server = http.createServer(app);
 
-app.post('/activate', (req, res) => {
-console.log('Current working directory (process.cwd()):', process.cwd());
-console.log('Current module directory (__dirname):', __dirname);
-    
-const pythonScriptPath = path.join(__dirname, 'Jarvis' , 'jarvis.py');
+app.post('/process-audio', (req, res) => {
+  const recognizedText = req.body.text;
+  
+  const pythonScriptPath = path.join(__dirname, 'Jarvis' , 'jarvis.py');
+  const pythonProcess = spawn('python', [pythonScriptPath, recognizedText]);
 
-console.log('Attempting to execute Python script at:', pythonScriptPath);
-
-const pythonProcess = spawn('python', [pythonScriptPath]);
-
-pythonProcess.stdout.on('data', (data) => {
+  pythonProcess.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);
-});
-
-pythonProcess.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-});
-
-  pythonProcess.on('close', (code) => {
-    console.log(`Jarvis assistant exited with code ${code}`);
+    res.json({ output: data.toString() });
   });
 
-  res.json({ message: 'Jarvis activated successfully!' });
+  pythonProcess.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+    res.status(500).json({ error: data.toString() });
+  });
+
+  pythonProcess.on('close', (code) => {
+    console.log(`Jarvis process exited with code ${code}`);
+  });
 });
 
 const io = new Server(server, {
