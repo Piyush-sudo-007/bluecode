@@ -16,10 +16,16 @@ app.post('/process-audio', (req, res) => {
   const recognizedText = req.body.text;
   console.log('Recognized Text:', recognizedText);
 
-  // Check if the recognized text contains a URL or website command
-  if (urlRegex.test(recognizedText)) {
-    // If the text is a website command (e.g., "open Google")
-    const websiteURL = recognizedText.match(urlRegex)[0];
+  if (/open\s+(https?:\/\/[^\s]+|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/.test(recognizedText)) {
+    // Extract the website name (e.g., "Google")
+    const website = recognizedText.replace(/^open\s+/i, '').trim();
+
+    // If the recognized text is just a website name, construct the URL
+    const websiteURL = website.includes("http") ? website : `https://www.${website}.com`;
+
+    console.log(`Opening website: ${websiteURL}`);
+
+    // Open the website
     open(websiteURL)
       .then(() => {
         res.json({ output: `Opening website ${websiteURL}` });
@@ -28,12 +34,17 @@ app.post('/process-audio', (req, res) => {
         console.error('Error opening website:', err);
         res.status(500).json({ error: 'Failed to open the website.' });
       });
+
   } else {
-    // If the text is more likely a song or music request (e.g., "play song XYZ")
+    // If it's a song or music request, assume it's a song and open YouTube search
     const songURL = `https://www.youtube.com/results?search_query=${encodeURIComponent(recognizedText)}`;
+
+    console.log(`Searching for song on YouTube: ${songURL}`);
+    
+    // Open YouTube search
     open(songURL)
       .then(() => {
-        res.json({ output: "Playing your song" });
+        res.json({ output: `Playing your requested song on YouTube!` });
       })
       .catch((err) => {
         console.error('Error opening YouTube:', err);
@@ -41,7 +52,6 @@ app.post('/process-audio', (req, res) => {
       });
   }
 });
-
 
 
 const io = new Server(server, {
