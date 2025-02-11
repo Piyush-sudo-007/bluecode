@@ -61,8 +61,16 @@ const Navbar = ({
     })
     .then((data) => {
       console.log("Response from Jarvis: ", data);
+
       if (data.output) {
-        speak(data.output);  // Speak the output received from Jarvis
+        speak(data.output);
+        if (data.link) {
+          const userConfirmed = window.confirm(`Please check this link: ${data.link}`);
+          if (userConfirmed) {
+            window.open(data.link, '_blank');
+          }
+        }
+
         setActive(false);
       } else {
         toast.warn("No output from Jarvis.");
