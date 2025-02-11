@@ -29,6 +29,7 @@ COPY . .
 # Install Node.js dependencies for the frontend
 WORKDIR /opt/render/project/src
 RUN npm install
+RUN npm install open --save
 
 WORKDIR /opt/render/project/src/Frontend
 RUN npm install
