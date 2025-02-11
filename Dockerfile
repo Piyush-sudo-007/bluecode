@@ -20,11 +20,9 @@ COPY . .
 
 # Install Python dependencies for the backend
 WORKDIR /opt/render/project/src/Jarvis
-RUN pip install --upgrade pip \
-    && pip install speechrecognition \
+RUN pip install speechrecognition \
     && pip install pyttsx3 \
-    && pip install PyAudio \
-    && pip install -r requirements.txt
+    && pip install PyAudio
 
 # Install Node.js dependencies for the frontend
 WORKDIR /opt/render/project/src
