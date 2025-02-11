@@ -63,6 +63,9 @@ img{
   justify-content: center;
   flex-direction: column;
 }
+.on{
+  border : 2px solid blue;
+}
 .tag{
   background-color: white;
   color: black;
