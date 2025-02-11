@@ -109,7 +109,18 @@ def backend_command(input_command):
     return response  # Return response as text for the server to handle
 
 # Example Usage - commands received from the backend (simulated)
+import sys
+
+# Your other imports and functions here (like process_command)
+
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Error: No input command provided.")
+        sys.exit(1)  # Exit the script with an error code
+
     input_command = sys.argv[1]
+
+    print(f"Received command: {input_command}")
     response = process_command(input_command)
     print(response)
+
