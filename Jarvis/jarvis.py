@@ -110,4 +110,6 @@ def backend_command(input_command):
 
 # Example Usage - commands received from the backend (simulated)
 if __name__ == "__main__":
-    processCommand();
+    input_command = sys.argv[1]
+    response = process_command(input_command)
+    print(response)
