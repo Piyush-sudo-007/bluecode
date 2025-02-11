@@ -2,7 +2,7 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import path from "path";
-import { spawn } from "child_process"; 
+import open from "open";
 
 const app = express();
 const port = 5000;
@@ -10,38 +10,38 @@ app.use(express.json());
 
 const server = http.createServer(app);
 
+const urlRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(?:\/[^\s]*)?/;
+
 app.post('/process-audio', (req, res) => {
   const recognizedText = req.body.text;
-  console.log(recognizedText);
-  
-  const pythonScriptPath = path.join(__dirname, 'Jarvis', 'jarvis.py');
-  const pythonProcess = spawn('python', [pythonScriptPath, recognizedText]);
+  console.log('Recognized Text:', recognizedText);
 
-  let responseSent = false;  // Flag to prevent sending multiple responses
-
-  pythonProcess.stdout.on('data', (data) => {
-    if (!responseSent) {
-      console.log(`stdout: ${data}`);
-      res.json({ output: data.toString() });
-      responseSent = true;  // Mark the response as sent
-    }
-  });
-
-  pythonProcess.stderr.on('data', (data) => {
-    if (!responseSent) {
-      console.error(`stderr: ${data}`);
-      res.status(500).json({ error: data.toString() });
-      responseSent = true;
-    }
-  });
-
-  pythonProcess.on('close', (code) => {
-    if (!responseSent) {
-      console.log(`Jarvis process exited with code ${code}`);
-      responseSent = true;
-    }
-  });
+  // Check if the recognized text contains a URL or website command
+  if (urlRegex.test(recognizedText)) {
+    // If the text is a website command (e.g., "open Google")
+    const websiteURL = recognizedText.match(urlRegex)[0];
+    open(websiteURL)
+      .then(() => {
+        res.json({ output: `Opening website ${websiteURL}` });
+      })
+      .catch((err) => {
+        console.error('Error opening website:', err);
+        res.status(500).json({ error: 'Failed to open the website.' });
+      });
+  } else {
+    // If the text is more likely a song or music request (e.g., "play song XYZ")
+    const songURL = `https://www.youtube.com/results?search_query=${encodeURIComponent(recognizedText)}`;
+    open(songURL)
+      .then(() => {
+        res.json({ output: "Playing your song" });
+      })
+      .catch((err) => {
+        console.error('Error opening YouTube:', err);
+        res.status(500).json({ error: 'Failed to open YouTube.' });
+      });
+  }
 });
+
 
 
 const io = new Server(server, {
