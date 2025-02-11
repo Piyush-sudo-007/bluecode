@@ -25,18 +25,37 @@ const Navbar = ({
 }) => {
   const [assistantStatus, setAssistantStatus] = useState(false);
 
-  const handleActivateAssistant = async () => {
-    fetch("https://bluecode-jeds.onrender.com/activate", {
-      method: "POST",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data.message);
-        setAssistantStatus(true);
+  const startListening = () => {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.start();
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      console.log("Recognized speech: ", transcript);
+      fetch("https://bluecode-jeds.onrender.com/process-audio", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: transcript }),
       })
-      .catch((error) => {
-        console.error("Error activating Jarvis:", error);
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Response from Jarvis: ", data);
+        })
+        .catch((error) => {
+          console.error("Error processing audio: ", error);
+        });
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error: ", event.error);
+      toast.warn("Sorry, I couldn't understand that.");
+    };
   };
 
   const handleLanguage = (e) => {
@@ -142,7 +161,7 @@ const Navbar = ({
         <p>{typing}</p>
       </div>
       <div className="btns">
-        <div className="assistant" onClick={handleActivateAssistant}>
+        <div className="assistant" onClick={startListening}>
           <p className="tag">&#128075; I am Byte, your voice assistant</p>
           <img src={icon} alt="Assistant Icon" />
           {assistantStatus && <p>Assistant is active!</p>}{" "}
