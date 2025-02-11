@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon Backend/index.js",
-    "build": "npm install && cd Frontend && npm install && npm run build"
+    "build": "npm install && cd Jarvis && pip install speechrecognition && pip install pyttsx3 && pip install PyAudio && cd ../Frontend && npm install && npm run build"
   },
   "author": "piyush",
   "license": "ISC",
