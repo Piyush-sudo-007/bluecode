@@ -1,26 +1,9 @@
-import speech_recognition as sr
-import webbrowser
-import pyttsx3
 import os
-import musicLibrary
-import subprocess
 import platform
-import requests  # Add this import to send requests to your backend API
+import subprocess
+import webbrowser  # Add webbrowser to open websites
 
-recognizer = sr.Recognizer()
-engine = pyttsx3.init()
-
-def get_engine():
-    global engine
-    if engine is None:
-        engine = pyttsx3.init()
-    return engine
-
-# The speak function has been replaced by text output
-def speak(text):
-    # In this updated code, we no longer speak out loud, instead we return the text.
-    return text
-
+# A function to get the desktop path of the user (for folder/file operations)
 def get_desktop_path():
     user = os.environ["USERPROFILE"]
     one_drive = os.path.join(user, "OneDrive")
@@ -28,36 +11,50 @@ def get_desktop_path():
         return os.path.join(one_drive, "Desktop")
     return os.path.join(user, "Desktop")
 
+# Function to open an item (file/folder or website)
 def open_item(path):
-    if os.path.isdir(path):  # Open folder
-        open_folder(path)
+    if path.lower() == "google":  # If the command is to open Google
+        return open_google()
+    elif os.path.isdir(path):  # Open folder
+        return open_folder(path)
     elif os.path.isfile(path):  # Open file
         try:
             system_name = platform.system()
             if system_name == "Windows":
-                os.startfile(path)  # for windows default opener
+                os.startfile(path)  # for Windows default opener
             elif system_name == "Darwin":  # for macOS
                 subprocess.Popen(["open", path])
-            elif system_name == "Linux":  # for linux
+            elif system_name == "Linux":  # for Linux
                 subprocess.Popen(["xdg-open", path])
             else:
-                return "Cannot support this Operating System."  # Changed from speak() to return
+                return "Cannot support this Operating System."
             return f"Opening {os.path.basename(path)}"
         except Exception as e:
             print(f"Error in opening file: {e}")
-            return "Unable to open this file."  # Changed from speak() to return
+            return "Unable to open this file."
     else:
-        return "Sorry! This specified item does not exist."  # Changed from speak() to return
+        return "Sorry! This specified item does not exist."
 
+# Function to open Google in the default web browser
+def open_google():
+    webbrowser.open("https://www.google.com")
+    return "Opening Google..."
+
+# Function to open a website based on the user's command
+def open_website(website):
+    # Adding http:// or https:// if not provided
+    if not website.lower().startswith("http://") and not website.lower().startswith("https://"):
+        website = "https://" + website
+    webbrowser.open(website)
+    return f"Opening {website}..."
+
+# Function to open a folder
 def open_folder(folder_name):
     desktop_path = get_desktop_path()
     folder_path = os.path.join(desktop_path, folder_name)
-    print(f"Checking path: {folder_path}")
-
     if os.path.exists(folder_path):
         try:
             system_name = platform.system()
-
             if system_name == "Windows":
                 subprocess.Popen(["explorer", folder_path], shell=True)
             elif system_name == "Darwin":  # macOS
@@ -65,88 +62,40 @@ def open_folder(folder_name):
             elif system_name == "Linux":
                 subprocess.Popen(["xdg-open", folder_path])
             else:
-                return "Unsupported operating system."  # Changed from speak() to return
+                return "Unsupported operating system."
             folder_name = os.path.basename(folder_path)  # Extract only the folder name
-            return f"Opening folder {folder_name}"  # Changed from speak() to return
-
+            return f"Opening folder {folder_name}"
         except Exception as e:
             print(f"Error opening folder: {e}")
-            return "Error opening folder."  # Changed from speak() to return
+            return "Error opening folder."
     else:
-        return "No such folder exists."  # Changed from speak() to return
+        return "No such folder exists."
 
+# Function to process the command received from the frontend
 def processCommand(command):
-    # Send recognized command to the backend API for processing
-    try:
-        response = requests.post(
-            'https://bluecode-jeds.onrender.com/process-audio',  # Update with your backend URL
-            json={"text": command}  # Send the command as JSON data
-        )
-        if response.status_code == 200:
-            result = response.json()
-            if "output" in result:
-                return result["output"]  # Return the response from the backend as text
-            else:
-                return "I couldn't understand the response."  # Changed from speak() to return
-        else:
-            return "There was an issue with processing your request."  # Changed from speak() to return
-    except requests.exceptions.RequestException as e:
-        print(f"Error communicating with backend: {e}")
-        return "Sorry, I couldn't reach the server."  # Changed from speak() to return
-
-def listen():
-    try:
-        with sr.Microphone() as source:
-            print("Listening...")
-            audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
-            return recognizer.recognize_google(audio)
-    except sr.UnknownValueError:
-        return "Sorry, I didn't catch that."  # Changed from speak() to return
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
-
-def jarvis_main():
-    is_active = False
-    response = "Say 'beta' to activate me... and 'deactivate' to exit."
+    command = command.lower()
     
-    while True:
-        r = sr.Recognizer()
-        print("Recognizing....")  
-        try:
-            if not is_active:
-                with sr.Microphone() as source:
-                    print("Listening....")
-                    audio = r.listen(source, timeout=5, phrase_time_limit=5)
-                word = r.recognize_google(audio)
-                print(word)
-                if word.lower() == "beta":
-                    is_active = True
-                    response = "Yes! How can I help you?"
-                elif word.lower() == "deactivate":
-                    is_active = False
-                    response = "See you soon!"
-                    break
-            else:
-                # Listen for command
-                with sr.Microphone() as source:
-                    print("Java active...")
-                    audio = r.listen(source)
-                    command = r.recognize_google(audio)
-                    if command.lower() == "deactivate":
-                        is_active = False
-                        response = "See you soon!"
-                    else:
-                        response = processCommand(command)  # Get the text response for the command
+    # Open specific websites based on the command
+    if "open google" in command:
+        return open_google()  # If command contains 'google', open Google
+    elif "open" in command and "website" in command:
+        # Extract the website URL (assuming the user says something like 'open website www.example.com')
+        words = command.split()
+        if len(words) > 1:
+            website = words[-1]  # Assuming the website is the last word
+            return open_website(website)
+        else:
+            return "Please provide a website to open."
+    # Add more conditions to handle other commands as necessary
+    return "Unknown command."
 
-        except sr.UnknownValueError:
-            response = "Sorry! I didn't understand."
-        except Exception as e:
-            print(f"Error: {e}")
-            response = f"Error: {e}"
-
-    return response  # Return the final response after main loop ends
+# Main function to handle frontend input (simulating text input from the frontend)
+def handle_frontend_input(text):
+    # Process the command sent from the frontend
+    return processCommand(text)
 
 if __name__ == "__main__":
-    final_response = jarvis_main()  # Call the main function and get the response
-    print(final_response)  # Print the response at the end
+    # Example: Let's assume the frontend sends text like "open google"
+    frontend_input = "open www.example.com"  # This would be sent from the frontend
+    response = handle_frontend_input(frontend_input)
+    print(response)  # This is the final response to be sent back to the frontend
