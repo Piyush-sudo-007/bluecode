@@ -31,41 +31,51 @@ const Navbar = ({
     window.speechSynthesis.speak(speech);  // Speak the text
   };
 
-  const startListening = () => {
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = "en-US";
-    recognition.continuous = false;
-    recognition.interimResults = false;
+ const startListening = () => {
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = "en-US";
+  recognition.continuous = false;
+  recognition.interimResults = false;
 
-    recognition.start();
+  recognition.start();
 
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      console.log("Recognized speech: ", transcript);
-      fetch("https://bluecode-jeds.onrender.com/process-audio", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: transcript }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Response from Jarvis: ", data);
-          if (data.output) {
-            speak(data.output);  // Speak the output received from Jarvis
-          }
-        })
-        .catch((error) => {
-          console.error("Error processing audio: ", error);
-        });
-    };
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    console.log("Recognized speech: ", transcript);
 
-    recognition.onerror = (event) => {
-      console.error("Speech recognition error: ", event.error);
-      toast.warn("Sorry, I couldn't understand that.");
-    };
+    fetch("https://bluecode-jeds.onrender.com/process-audio", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text: transcript }),
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch data from backend.");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Response from Jarvis: ", data);
+      if (data.output) {
+        speak(data.output);  // Speak the output received from Jarvis
+      } else {
+        toast.warn("No output from Jarvis.");
+      }
+    })
+    .catch((error) => {
+      console.error("Error processing audio: ", error);
+      toast.error("Something went wrong, please try again.");
+    });
   };
+
+  recognition.onerror = (event) => {
+    console.error("Speech recognition error: ", event.error);
+    toast.warn("Sorry, I couldn't understand that.");
+  };
+};
+
 
   const handleLanguage = (e) => {
     const newLanguage = e.target.value;
