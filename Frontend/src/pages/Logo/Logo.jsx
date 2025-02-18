@@ -7,7 +7,7 @@ const Logo = () => {
         <div className="upper"></div>
         <div className="lower"></div>
       </div>
-      <h3 style={{ color: "red", textDecoration: "underline" }}>
+      <h3 style={{ color: "green", textDecoration: "underline" }}>
         Please use pre-defined user inputs !! This issue will be shorted in
         upcoming version.
       </h3>
